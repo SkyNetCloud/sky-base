@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Minecraft Build Checklist</title>
+    <style>
+        :root {
+            --bg: #23272a;
+            --container-bg: #2c2f33;
+            --text: #f6f6f6;
+            --accent: #00c853;
+            --li-bg: #36393f;
+            --li-hover: #424549;
+            --shadow: 0 4px 24px rgba(0,0,0,0.2);
+            --input-bg: #23272a;
+            --input-text: #f6f6f6;
+            --checked: #bdbdbd;
+        }
+        body.light {
+            --bg: #f6f6f6;
+            --container-bg: #fff;
+            --text: #23272a;
+            --accent: #00c853;
+            --li-bg: #f0f0f0;
+            --li-hover: #e0e0e0;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --input-bg: #fff;
+            --input-text: #23272a;
+            --checked: #888;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 500px;
+            margin: 3em auto;
+            background: var(--container-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2em 2.5em 2.5em 2.5em;
+            transition: background 0.3s, box-shadow 0.3s;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5em;
+            font-size: 2em;
+            letter-spacing: 1px;
+            color: var(--accent);
+            text-shadow: 0 2px 8px #0004;
+        }
+        #fileInput {
+            display: block;
+            margin: 0 auto 2em auto;
+            padding: 0.5em;
+            border-radius: 6px;
+            border: none;
+            background: var(--input-bg);
+            color: var(--input-text);
+            font-size: 1em;
+            box-shadow: 0 2px 8px #0002;
+            transition: background 0.3s, color 0.3s;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 1em;
+            background: var(--li-bg);
+            border-radius: 8px;
+            padding: 0.75em 1em;
+            transition: background 0.2s;
+            box-shadow: 0 1px 4px #0002;
+        }
+        li:hover {
+            background: var(--li-hover);
+        }
+        label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 1.08em;
+        }
+        input[type="checkbox"] {
+            accent-color: var(--accent);
+            width: 1.2em;
+            height: 1.2em;
+            margin-right: 1em;
+            cursor: pointer;
+        }
+        input[type="checkbox"]:checked + span {
+            text-decoration: line-through;
+            color: var(--checked);
+        }
+        .toggle-mode {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 1.5em;
+        }
+        .toggle-mode label {
+            font-size: 1em;
+            margin-left: 0.5em;
+            color: var(--text);
+            cursor: pointer;
+            user-select: none;
+        }
+        .toggle-switch {
+            width: 40px;
+            height: 22px;
+            background: #bbb;
+            border-radius: 11px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-left: 1em;
+        }
+        .toggle-switch input {
+            display: none;
+        }
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            transition: left 0.3s;
+            box-shadow: 0 1px 4px #0002;
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            left: 20px;
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="toggle-mode">
+            <span>🌙</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="modeToggle">
+                <span class="toggle-slider"></span>
+            </label>
+            <span>☀️</span>
+        </div>
+        <h1>Minecraft Build Checklist</h1>
+        <input type="file" id="fileInput" accept=".txt">
+        <ul id="checklist"></ul>
+    </div>
+    <script>
+        // Theme toggle logic
+        const modeToggle = document.getElementById('modeToggle');
+        const body = document.body;
+
+        // Load saved mode
+        if (localStorage.getItem('theme') === 'light') {
+            body.classList.add('light');
+            modeToggle.checked = true;
+        }
+
+        modeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                body.classList.add('light');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove('light');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Checklist logic
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const lines = evt.target.result.split(/\r?\n/).filter(Boolean);
+                const ul = document.getElementById('checklist');
+                ul.innerHTML = '';
+                lines.forEach((line, idx) => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<label><input type="checkbox"><span>${line}</span></label>`;
+                    ul.appendChild(li);
+                });
+            };
+            reader.readAsText(file);
+        });
+    </script>
+</body>
+</html>
